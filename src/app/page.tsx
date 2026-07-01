@@ -32,7 +32,7 @@ function HomeInner() {
   useEffect(() => {
     // Coming from /start after integrity gate — go straight to assessment
     if (tokenFromUrl && startFromUrl) { setView('org-profile'); return }
-    const saved = loadProgress()
+    const saved = tokenFromUrl ? loadProgress() : null
     if (saved && saved.view !== 'landing' && saved.view !== 'generating' && saved.view !== 'report') setShowResume(true)
   }, [tokenFromUrl, startFromUrl])
 
@@ -42,7 +42,7 @@ function HomeInner() {
   }, [view, currentModuleIndex, org, initiative, moduleAnswers])
 
   function handleResume() {
-    const saved = loadProgress()
+    const saved = tokenFromUrl ? loadProgress() : null
     if (!saved) return
     setView(saved.view as AppView); setCurrentModuleIndex(saved.currentModuleIndex)
     setOrg(saved.org as unknown as OrgProfile); setInitiative(saved.initiative as unknown as InitiativeProfile)
