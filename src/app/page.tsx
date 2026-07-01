@@ -28,6 +28,7 @@ function HomeInner() {
   const [org, setOrg] = useState<OrgProfile>(EMPTY_ORG)
   const [initiative, setInitiative] = useState<InitiativeProfile>(EMPTY_INIT)
   const [moduleAnswers, setModuleAnswers] = useState<Record<string, Record<string, string>>>({})
+  const [completedSections, setCompletedSections] = useState<string[]>([])
   const [report, setReport] = useState<SolutionReport | null>(null)
 
   useEffect(() => {
@@ -40,6 +41,12 @@ function HomeInner() {
           setOrg(saved.org as unknown as OrgProfile)
           setInitiative(saved.initiative as unknown as InitiativeProfile)
           setModuleAnswers(saved.moduleAnswers)
+          // Rebuild completed sections from saved state
+          const completed: string[] = []
+          if (saved.org && Object.keys(saved.org).length > 0) completed.push('org-profile')
+          if (saved.initiative && Object.keys(saved.initiative).length > 0) completed.push('init-profile')
+          ALL_MODULES.slice(0, saved.currentModuleIndex).forEach(m => completed.push(m.id))
+          setCompletedSections(completed)
           return
         }
       }
@@ -60,9 +67,16 @@ function HomeInner() {
     })
   }, [view, currentModuleIndex, org, initiative, moduleAnswers, tokenFromUrl])
 
+  // Current section ID for the progress dots
+  const currentSection = view === 'assessment' && ALL_MODULES[currentModuleIndex]
+    ? ALL_MODULES[currentModuleIndex].id
+    : view
+
   function handleModuleComplete(moduleId: string, answers: Record<string, string>) {
     const updated = { ...moduleAnswers, [moduleId]: answers }
     setModuleAnswers(updated)
+    setCompletedSections(prev => [...prev.filter(s => s !== moduleId), moduleId])
+
     if (currentModuleIndex < ALL_MODULES.length - 1) {
       setCurrentModuleIndex(i => i + 1)
     } else {
@@ -92,6 +106,7 @@ function HomeInner() {
     setInitiative(EMPTY_INIT)
     setModuleAnswers({})
     setCurrentModuleIndex(0)
+    setCompletedSections([])
     setReport(null)
     setView('landing')
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -123,7 +138,14 @@ function HomeInner() {
               sectionNumber={1}
               totalSections={totalSections}
               initialAnswers={org as unknown as Record<string, string>}
-              onComplete={(answers) => { setOrg(answers as unknown as OrgProfile); setView('init-profile'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+              currentSection="org-profile"
+              completedSections={completedSections}
+              onComplete={(answers) => {
+                setOrg(answers as unknown as OrgProfile)
+                setCompletedSections(prev => [...prev.filter(s => s !== 'org-profile'), 'org-profile'])
+                setView('init-profile')
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
             />
           </motion.div>
         )}
@@ -136,7 +158,14 @@ function HomeInner() {
               sectionNumber={2}
               totalSections={totalSections}
               initialAnswers={initiative as unknown as Record<string, string>}
-              onComplete={(answers) => { setInitiative(answers as unknown as InitiativeProfile); setView('assessment'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+              currentSection="init-profile"
+              completedSections={completedSections}
+              onComplete={(answers) => {
+                setInitiative(answers as unknown as InitiativeProfile)
+                setCompletedSections(prev => [...prev.filter(s => s !== 'init-profile'), 'init-profile'])
+                setView('assessment')
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
             />
           </motion.div>
         )}
@@ -150,6 +179,8 @@ function HomeInner() {
               totalSections={totalSections}
               overallProgress={overallProgress}
               existingAnswers={moduleAnswers[currentModule.id] ?? {}}
+              currentSection={currentModule.id}
+              completedSections={completedSections}
               onComplete={(answers) => handleModuleComplete(currentModule.id, answers)}
               onBack={() => { currentModuleIndex > 0 ? setCurrentModuleIndex(i => i - 1) : setView('init-profile') }}
             />
