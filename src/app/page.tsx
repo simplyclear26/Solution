@@ -19,7 +19,7 @@ const EMPTY_INIT: InitiativeProfile = { init_name: '', init_type: '', init_stage
 
 function HomeInner() {
   const searchParams = useSearchParams()
-  const tokenFromUrl = searchParams.get('token')
+  const tokenFromUrl = searchParams.get('token') ?? ''
   const startFromUrl = searchParams.get('start')
   const resumeFromUrl = searchParams.get('resume')
 
@@ -33,8 +33,7 @@ function HomeInner() {
   useEffect(() => {
     if (tokenFromUrl && startFromUrl) {
       if (resumeFromUrl) {
-        // Resume saved progress
-        const saved = loadProgress()
+        const saved = loadProgress(tokenFromUrl)
         if (saved && saved.view !== 'landing' && saved.view !== 'generating' && saved.view !== 'report') {
           setView(saved.view as AppView)
           setCurrentModuleIndex(saved.currentModuleIndex)
@@ -44,15 +43,22 @@ function HomeInner() {
           return
         }
       }
-      // No saved progress or not resuming — start from beginning
       setView('org-profile')
     }
   }, [tokenFromUrl, startFromUrl, resumeFromUrl])
 
   useEffect(() => {
+    if (!tokenFromUrl) return
     if (view === 'landing' || view === 'generating' || view === 'report') return
-    saveProgress({ view, currentModuleIndex, org: org as unknown as Record<string, string>, initiative: initiative as unknown as Record<string, string>, moduleAnswers })
-  }, [view, currentModuleIndex, org, initiative, moduleAnswers])
+    saveProgress({
+      token: tokenFromUrl,
+      view,
+      currentModuleIndex,
+      org: org as unknown as Record<string, string>,
+      initiative: initiative as unknown as Record<string, string>,
+      moduleAnswers,
+    })
+  }, [view, currentModuleIndex, org, initiative, moduleAnswers, tokenFromUrl])
 
   function handleModuleComplete(moduleId: string, answers: Record<string, string>) {
     const updated = { ...moduleAnswers, [moduleId]: answers }

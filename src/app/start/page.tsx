@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { IntegrityGate } from '@/components/IntegrityGate'
+import { loadProgress, clearProgress } from '@/lib/storage'
 
 function StartInner() {
   const params = useSearchParams()
@@ -15,16 +16,12 @@ function StartInner() {
 
   useEffect(() => {
     if (!token) { setStatus('invalid'); return }
-    // Check for saved progress
-    try {
-      const saved = localStorage.getItem('scs_progress')
-      if (saved) {
-        const parsed = JSON.parse(saved)
-        if (parsed.view && parsed.view !== 'landing' && parsed.view !== 'report') {
-          setHasSavedProgress(true)
-        }
-      }
-    } catch (_) {}
+
+    // Only show resume if saved progress matches THIS token
+    const saved = loadProgress(token)
+    if (saved && saved.view !== 'landing' && saved.view !== 'report') {
+      setHasSavedProgress(true)
+    }
 
     fetch(`/api/validate-token?token=${token}`)
       .then(res => res.json())
@@ -62,9 +59,7 @@ function StartInner() {
           Please check your email for the correct link or contact us at{' '}
           <a href="mailto:clarify@simplyclear.work" className="text-[#2AB8A0]">clarify@simplyclear.work</a>
         </p>
-        <a href="/" className="text-sm text-[#636366] border border-[#E5E3DF] px-6 py-3 rounded-lg inline-block">
-          Return to home
-        </a>
+        <a href="/" className="text-sm text-[#636366] border border-[#E5E3DF] px-6 py-3 rounded-lg inline-block">Return to home</a>
       </motion.div>
     </div>
   )
@@ -77,14 +72,12 @@ function StartInner() {
           Your 90-day access period has ended. Contact us at{' '}
           <a href="mailto:clarify@simplyclear.work" className="text-[#2AB8A0]">clarify@simplyclear.work</a>
         </p>
-        <a href="/" className="text-sm text-[#636366] border border-[#E5E3DF] px-6 py-3 rounded-lg inline-block">
-          Return to home
-        </a>
+        <a href="/" className="text-sm text-[#636366] border border-[#E5E3DF] px-6 py-3 rounded-lg inline-block">Return to home</a>
       </motion.div>
     </div>
   )
 
-  // If they have saved progress, give them the choice
+  // Saved progress exists for this exact token — offer resume
   if (hasSavedProgress) return (
     <div className="min-h-screen flex items-center justify-center bg-white px-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-md">
@@ -103,10 +96,7 @@ function StartInner() {
             Resume where I left off
           </button>
           <button
-            onClick={() => {
-              localStorage.removeItem('scs_progress')
-              window.location.href = `/?token=${token}&start=true`
-            }}
+            onClick={() => { clearProgress(); window.location.href = `/?token=${token}&start=true` }}
             className="w-full text-sm text-[#636366] border border-[#E5E3DF] px-8 py-4 rounded-lg hover:border-[#636366] hover:text-[#1C1C1E] transition-all"
           >
             Start fresh
@@ -116,6 +106,7 @@ function StartInner() {
     </div>
   )
 
+  // First time with this token — show welcome screen
   return (
     <IntegrityGate
       customerName={customerName}

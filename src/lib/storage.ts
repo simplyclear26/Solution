@@ -1,9 +1,7 @@
-// Progress saving — persists assessment state to localStorage
-// so users can close the browser and resume where they left off
-
 const STORAGE_KEY = 'scs_progress'
 
 export interface SavedProgress {
+  token: string
   view: string
   currentModuleIndex: number
   org: Record<string, string>
@@ -16,16 +14,17 @@ export function saveProgress(data: Omit<SavedProgress, 'savedAt'>) {
   try {
     const payload: SavedProgress = { ...data, savedAt: new Date().toISOString() }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
-  } catch {
-    // localStorage not available — fail silently
-  }
+  } catch {}
 }
 
-export function loadProgress(): SavedProgress | null {
+export function loadProgress(token?: string): SavedProgress | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return null
     const data = JSON.parse(raw) as SavedProgress
+
+    // If a token is provided, only return progress for that exact token
+    if (token && data.token !== token) return null
 
     // Expire progress after 7 days
     const savedAt = new Date(data.savedAt)
@@ -45,6 +44,6 @@ export function clearProgress() {
   } catch {}
 }
 
-export function hasProgress(): boolean {
-  return loadProgress() !== null
+export function hasProgress(token?: string): boolean {
+  return loadProgress(token) !== null
 }
