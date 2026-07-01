@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { CheckoutButton } from './CheckoutButton'
 
 interface LandingProps {
-  onBegin?: () => void // kept for local testing without payment
+  onBegin?: () => void
 }
 
 const DELIVERABLES = [
@@ -36,6 +36,12 @@ const DELIVERABLES = [
     number: '05',
     title: 'Executive briefing document',
     desc: 'A two-page summary your board or leadership team can read in five minutes. Scores, risks, priorities, next step.',
+    value: '$500',
+  },
+  {
+    number: '06',
+    title: '60-minute post-assessment consult',
+    desc: 'A personal debrief with a Simply Clear practitioner to work through your findings, challenge assumptions, and agree on priorities.',
     value: '$500',
   },
 ]
@@ -77,12 +83,9 @@ export function Landing({ onBegin }: LandingProps) {
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          className="flex flex-col items-center gap-3">
           <CheckoutButton />
-          <div className="text-center">
-            <p className="text-2xl font-serif text-[#1C1C1E]">$997</p>
-            <p className="text-xs text-[#8E8E93] mt-0.5">includes a 60-minute debrief call</p>
-          </div>
+          <p className="text-xs text-[#8E8E93] font-light">Includes a 60-minute post-assessment consult</p>
         </motion.div>
       </section>
 
@@ -118,7 +121,7 @@ export function Landing({ onBegin }: LandingProps) {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
             className="mt-6 flex justify-between items-center px-6 py-4 bg-[#1C1C1E] text-white rounded-xl">
             <span className="font-medium">Total consultant equivalent value</span>
-            <span className="font-serif text-2xl">$8,500+</span>
+            <span className="font-serif text-2xl">$9,000+</span>
           </motion.div>
         </div>
       </section>
@@ -159,7 +162,7 @@ export function Landing({ onBegin }: LandingProps) {
               { step: '1', title: 'Answer honestly', desc: 'Work through seven diagnostic modules covering every dimension of transformation health. The questions are specific. The more honest your answers, the more useful your report.' },
               { step: '2', title: 'Receive your report', desc: 'Your report is generated immediately and includes all five deliverables. You can view it on screen and download it as a PDF.' },
               { step: '3', title: 'Hear from us within 24 hours', desc: 'A Simply Clear practitioner will review your results and send you a personal note within 24 hours. No automated emails.' },
-              { step: '4', title: 'Book your debrief', desc: 'Your purchase includes a 60-minute Google Meet debrief call to work through the findings and agree on priorities. This call is where the real clarity happens.' },
+              { step: '4', title: 'Book your consult', desc: 'Your purchase includes a 60-minute post-assessment consult to work through the findings and agree on priorities. This is where the real clarity happens.' },
             ].map((item) => (
               <div key={item.step} className="flex gap-5 bg-white border border-[#E5E3DF] rounded-xl p-6">
                 <span className="font-serif text-2xl text-[#8E8E93] shrink-0 w-6 text-center">{item.step}</span>
@@ -179,13 +182,15 @@ export function Landing({ onBegin }: LandingProps) {
           Ready to get a clear picture?
         </h2>
         <p className="text-[#636366] font-light max-w-md mx-auto mb-10 leading-relaxed">
-          30 minutes of honest answers. Five deliverables. A 60-minute debrief. One clear path forward.
+          30 minutes of honest answers. Five deliverables. A 60-minute post-assessment consult. One clear path forward.
         </p>
-        <CheckoutButton
-          label="Begin the assessment — $997"
-          className="group inline-flex items-center gap-3 bg-[#2AB8A0] text-white font-medium px-10 py-4 rounded-lg hover:bg-[#1A7A6A] transition-all duration-200 hover:-translate-y-px text-base"
-        />
-        <p className="text-xs text-[#8E8E93] mt-4">Includes a 60-minute debrief call with a Simply Clear practitioner</p>
+        <div className="flex flex-col items-center gap-3">
+          <CheckoutButton
+            label="Begin the assessment — $997"
+            className="group inline-flex items-center gap-3 bg-[#2AB8A0] text-white font-medium px-10 py-4 rounded-lg hover:bg-[#1A7A6A] transition-all duration-200 hover:-translate-y-px text-base"
+          />
+          <p className="text-xs text-[#8E8E93] font-light">Includes a 60-minute post-assessment consult</p>
+        </div>
 
         <p className="mt-16 text-[#8E8E93] text-sm">
           <span className="font-serif italic">Simply Clear</span>
