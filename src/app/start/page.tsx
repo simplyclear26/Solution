@@ -24,7 +24,7 @@ function StartInner() {
   if (status === 'invalid') return (<div className="min-h-screen flex items-center justify-center bg-white px-6"><motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-md"><h1 className="font-serif text-2xl text-[#1C1C1E] mb-4">This link is not valid</h1><p className="text-[#636366] font-light leading-relaxed mb-8">Please check your email for the correct link or contact us at <a href="mailto:clarify@simplyclear.work" className="text-[#2AB8A0]">clarify@simplyclear.work</a></p><a href="/" className="text-sm text-[#636366] border border-[#E5E3DF] px-6 py-3 rounded-lg inline-block">Return to home</a></motion.div></div>)
   if (status === 'expired') return (<div className="min-h-screen flex items-center justify-center bg-white px-6"><motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-md"><h1 className="font-serif text-2xl text-[#1C1C1E] mb-4">This link has expired</h1><p className="text-[#636366] font-light leading-relaxed mb-8">Your 90-day access period has ended. Contact us at <a href="mailto:clarify@simplyclear.work" className="text-[#2AB8A0]">clarify@simplyclear.work</a></p><a href="/" className="text-sm text-[#636366] border border-[#E5E3DF] px-6 py-3 rounded-lg inline-block">Return to home</a></motion.div></div>)
 
-  return (<IntegrityGate customerName={customerName} onReady={() => { window.location.href = `/?token=${token}&start=true` }} onNotReady={() => { window.open('https://www.simplyclear.work/contact', '_blank') }} />)
+  return (<IntegrityGate customerName={customerName} onReady={() => { window.location.href = `/?token=${token}&start=true` }}} />)
 }
 
 export default function StartPage() {
