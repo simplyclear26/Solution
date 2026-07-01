@@ -30,7 +30,8 @@ function HomeInner() {
   const [showResume, setShowResume] = useState(false)
 
   useEffect(() => {
-    if (tokenFromUrl && startFromUrl) { setView('integrity'); return }
+    // Coming from /start after integrity gate — go straight to assessment
+    if (tokenFromUrl && startFromUrl) { setView('org-profile'); return }
     const saved = loadProgress()
     if (saved && saved.view !== 'landing' && saved.view !== 'generating' && saved.view !== 'report') setShowResume(true)
   }, [tokenFromUrl, startFromUrl])
