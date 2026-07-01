@@ -25,17 +25,27 @@ export async function POST(req: NextRequest) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
 
-    const email        = session.customer_email ?? session.customer_details?.email ?? ''
-    const name         = (session.metadata?.name ?? session.customer_details?.name ?? 'there').trim()
-    const organisation = session.customer_details?.address?.city ?? ''
+    const email = session.customer_details?.email ?? ''
+    const name  = (session.customer_details?.name ?? '').trim()
+
+    // Extract custom fields
+    const customFields = session.custom_fields ?? []
+    const companyName  = customFields.find(f => f.key === 'company_name')?.text?.value ?? ''
+    const abn          = customFields.find(f => f.key === 'abn')?.text?.value ?? ''
+
+    const organisation = companyName || session.customer_details?.address?.city || ''
 
     if (!email) {
       console.error('No email found in session')
       return NextResponse.json({ error: 'No email' }, { status: 400 })
     }
 
+    if (!name) {
+      console.error('No name found in session')
+      return NextResponse.json({ error: 'No name' }, { status: 400 })
+    }
+
     try {
-      // Create a unique 90-day access token
       const token = await createToken({
         email,
         name,
@@ -43,11 +53,8 @@ export async function POST(req: NextRequest) {
         stripeSessionId: session.id,
       })
 
-      // Send magic link to customer
       await sendMagicLink(email, name, token)
-
-      // Send notification to Simply Clear
-      await sendPurchaseNotification(name, email, organisation, token)
+      await sendPurchaseNotification(name, email, organisation, abn, token)
 
       console.log(`Purchase processed for ${email} — token created`)
     } catch (err) {
@@ -58,5 +65,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true })
 }
-
-// Required for Stripe webhook — disable body parsing

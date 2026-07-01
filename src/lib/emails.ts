@@ -57,13 +57,10 @@ export async function sendMagicLink(
     <p>Hi ${firstName},</p>
     <p>Thank you for purchasing the Simply Clear Solution. Your unique assessment link is below — click it to begin, or save this email and come back when the time is right.</p>
     <p>This link gives you access for <strong>90 days</strong>. You can pause and resume at any time.</p>
-
     <a href="${link}" class="btn">Begin my assessment</a>
-
     <p class="note">If the button does not work, copy and paste this link into your browser:</p>
     <div class="link">${link}</div>
-
-    <p style="margin-top: 32px;">Once you complete the assessment, someone from Simply Clear will be in touch within 24 hours to arrange your included 60-minute debrief call.</p>
+    <p style="margin-top: 32px;">Once you complete the assessment, someone from Simply Clear will be in touch within 24 hours to arrange your included 60-minute post-assessment consult.</p>
     <p>If you have any questions before you begin, just reply to this email.</p>
   </div>
   <div class="footer">
@@ -80,6 +77,7 @@ export async function sendPurchaseNotification(
   name: string,
   email: string,
   organisation: string,
+  abn: string,
   token: string
 ): Promise<void> {
   const link = `${APP_URL}/start?token=${token}`
@@ -103,13 +101,17 @@ export async function sendPurchaseNotification(
       <td style="padding: 10px 0; border-bottom: 1px solid #E5E3DF; font-size: 13px;">${organisation || 'Not provided'}</td>
     </tr>
     <tr>
+      <td style="padding: 10px 0; border-bottom: 1px solid #E5E3DF; color: #8E8E93; font-size: 13px;">ABN</td>
+      <td style="padding: 10px 0; border-bottom: 1px solid #E5E3DF; font-size: 13px;">${abn || 'Not provided'}</td>
+    </tr>
+    <tr>
       <td style="padding: 10px 0; color: #8E8E93; font-size: 13px;">Amount</td>
       <td style="padding: 10px 0; font-size: 13px; font-weight: 500;">$997 AUD</td>
     </tr>
   </table>
   <p style="font-size: 13px; color: #636366; margin-bottom: 8px;">Their access link:</p>
   <p style="font-size: 12px; font-family: monospace; background: #F5F4F1; padding: 12px; border-radius: 6px; word-break: break-all;">${link}</p>
-  <p style="font-size: 13px; color: #636366; margin-top: 24px;">Reply directly to <a href="mailto:${email}">${email}</a> to arrange their debrief call within 24 hours.</p>
+  <p style="font-size: 13px; color: #636366; margin-top: 24px;">Reply directly to <a href="mailto:${email}">${email}</a> to arrange their post-assessment consult within 24 hours.</p>
   <p style="font-size: 12px; color: #8E8E93; margin-top: 32px; font-style: italic;">Simply Clear · clarify@simplyclear.work</p>
 </body>
 </html>`

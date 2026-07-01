@@ -7,9 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, name } = await req.json()
-
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://solution.simplyclear.work'
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://solutions.simplyclear.work'
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -20,18 +18,28 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: 'payment',
-      customer_email: email,
-      metadata: {
-        name: name ?? '',
+      billing_address_collection: 'required',
+      custom_fields: [
+        {
+          key: 'company_name',
+          label: { type: 'custom', custom: 'Company name' },
+          type: 'text',
+          optional: true,
+        },
+        {
+          key: 'abn',
+          label: { type: 'custom', custom: 'ABN (for invoicing)' },
+          type: 'text',
+          optional: true,
+        },
+      ],
+      custom_text: {
+        submit: {
+          message: 'Your assessment link will be emailed to you immediately after payment. Includes a 60-minute post-assessment consult with a Simply Clear practitioner.',
+        },
       },
       success_url: `${appUrl}/access?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/?cancelled=true`,
-      billing_address_collection: 'required',
-      custom_text: {
-        submit: {
-          message: 'Your assessment link will be emailed to you immediately after payment. Includes a 60-minute debrief call with a Simply Clear practitioner.',
-        },
-      },
     })
 
     return NextResponse.json({ url: session.url })
