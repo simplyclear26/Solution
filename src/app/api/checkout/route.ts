@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
       },
       success_url: `${appUrl}/access?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/?cancelled=true`,
+      allow_promotion_codes: true,
     })
 
     return NextResponse.json({ url: session.url })
